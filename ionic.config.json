@@ -1,0 +1,7 @@
+{
+  "name": "ecomerceionic-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
