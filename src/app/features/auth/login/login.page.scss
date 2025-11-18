@@ -1,0 +1,29 @@
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+
+.header h1 {
+  font-size: 34px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.header p {
+  color: #aaa;
+  margin-bottom: 30px;
+}
+
+.input-dark {
+  --background: var(--input-bg);
+  border-radius: 10px;
+  margin-bottom: 18px;
+  padding: 4px;
+}
+
+.btn-login {
+  margin-top: 20px;
+  --border-radius: 12px;
+}

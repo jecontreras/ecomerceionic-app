@@ -1,0 +1,42 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Productos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ng-container *ngIf="!loading; else loadingTpl">
+    <ion-list>
+      <ion-item *ngFor="let p of products; trackBy: trackById">
+        <ion-thumbnail slot="start">
+          <img [src]="p.image" />
+        </ion-thumbnail>
+        <ion-label>
+          <h2>{{ p.titulo }}</h2>
+
+          <p *ngIf="p.precioOferta > 0">
+            <span style="text-decoration: line-through;">
+              {{ p.precioBase | currency:'COP' }}
+            </span>
+            <strong class="ion-margin-start">
+              {{ p.precioOferta | currency:'COP' }}
+            </strong>
+          </p>
+
+          <p *ngIf="p.precioOferta === 0">
+            <strong>{{ p.precioBase | currency:'COP' }}</strong>
+          </p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </ng-container>
+
+  <ng-template #loadingTpl>
+    <ion-spinner class="ion-margin"></ion-spinner>
+  </ng-template>
+</ion-content>

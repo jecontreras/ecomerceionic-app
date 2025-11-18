@@ -1,0 +1,73 @@
+<ion-content class="ion-padding reg-container" *ngIf="role === 'customer'">
+
+  <h1>Crear cuenta</h1>
+
+  <ion-item class="input-dark">
+    <ion-label position="stacked">Nombre completo</ion-label>
+    <ion-input [(ngModel)]="fullName"></ion-input>
+  </ion-item>
+
+  <ion-item class="input-dark">
+    <ion-label position="stacked">Teléfono</ion-label>
+    <ion-input type="tel" [(ngModel)]="phone"></ion-input>
+  </ion-item>
+
+  <ion-item class="input-dark">
+    <ion-label position="stacked">Email (opcional)</ion-label>
+    <ion-input type="email" [(ngModel)]="email"></ion-input>
+  </ion-item>
+
+  <ion-item class="input-dark">
+    <ion-label position="stacked">Contraseña</ion-label>
+    <ion-input type="password" [(ngModel)]="password"></ion-input>
+  </ion-item>
+
+  <ion-button expand="block" class="btn-register" (click)="submit()">
+    Registrarme
+  </ion-button>
+
+</ion-content>
+
+<ion-content class="ion-padding reg-container" *ngIf="role === 'vendor'">
+
+  <h1>Registrar Vendedor</h1>
+
+  <div class="logo-preview" *ngIf="logoUrl">
+    <img [src]="logoUrl">
+  </div>
+
+  <ion-item class="input-dark">
+    <ion-label position="stacked">Logo (opcional)</ion-label>
+    <input type="file" (change)="handleFile($event)" accept="image/*">
+  </ion-item>
+
+  <ion-item class="input-dark">
+    <ion-label position="stacked">Nombre completo</ion-label>
+    <ion-input [(ngModel)]="fullName"></ion-input>
+  </ion-item>
+
+  <ion-item class="input-dark">
+    <ion-label position="stacked">Teléfono</ion-label>
+    <ion-input type="tel" [(ngModel)]="phone"></ion-input>
+  </ion-item>
+
+  <ion-item class="input-dark">
+    <ion-label position="stacked">Email</ion-label>
+    <ion-input type="email" [(ngModel)]="email"></ion-input>
+  </ion-item>
+
+  <ion-item class="input-dark">
+    <ion-label position="stacked">Contraseña</ion-label>
+    <ion-input type="password" [(ngModel)]="password"></ion-input>
+  </ion-item>
+
+  <ion-item class="input-dark">
+    <ion-label position="stacked">Referido por (opcional)</ion-label>
+    <ion-input [(ngModel)]="referredBy"></ion-input>
+  </ion-item>
+
+  <ion-button expand="block" class="btn-register" (click)="submit()">
+    Crear cuenta de vendedor
+  </ion-button>
+
+</ion-content>

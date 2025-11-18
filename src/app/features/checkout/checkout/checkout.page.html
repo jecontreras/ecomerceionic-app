@@ -1,0 +1,58 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Finalizar compra</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <h2>Datos de envío</h2>
+
+  <ion-item>
+    <ion-label position="stacked">Nombre completo</ion-label>
+    <ion-input [(ngModel)]="nombre"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Teléfono</ion-label>
+    <ion-input type="tel" [(ngModel)]="telefono"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Dirección</ion-label>
+    <ion-input [(ngModel)]="direccion"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Ciudad</ion-label>
+    <ion-input [(ngModel)]="ciudad"></ion-input>
+  </ion-item>
+
+  <h2>Método de pago</h2>
+
+  <ion-item>
+    <ion-label>Método</ion-label>
+    <ion-select [(ngModel)]="paymentType">
+      <ion-select-option value="contraentrega">Contra entrega</ion-select-option>
+      <ion-select-option value="online">Pago online</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <h2>Resumen</h2>
+
+  <div *ngFor="let item of items" class="item-resumen">
+    <img [src]="item.image" class="thumb" />
+    <div>
+      <strong>{{ item.titulo }}</strong><br>
+      Cant: {{ item.cantidad }}<br>
+      ${{ item.precio }}
+    </div>
+  </div>
+
+  <h2>Total: ${{ total() }}</h2>
+
+  <ion-button expand="block" color="primary" (click)="submitOrder()" [disabled]="loading">
+    {{ loading ? 'Procesando...' : 'Confirmar compra' }}
+  </ion-button>
+
+</ion-content>

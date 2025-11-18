@@ -1,0 +1,52 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Mis Órdenes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <!-- Filtro por estado -->
+  <ion-segment
+    [value]="selectedStatus"
+    (ionChange)="onStatusChange($event)"
+    class="ion-padding"
+  >
+    <ion-segment-button *ngFor="let s of statuses" [value]="s.value">
+      {{ s.label }}
+    </ion-segment-button>
+  </ion-segment>
+
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ng-container *ngIf="!loading; else loadingTpl">
+    <ion-list>
+      <ion-item
+        *ngFor="let o of orders; trackBy: trackById"
+        (click)="goToDetail(o.id)"
+      >
+        <ion-label>
+          <h2>Pedido #{{ o.codigo }}</h2>
+          <p>{{ o.fecha | date: 'medium' }}</p>
+          <p>Total: <strong>{{ o.total | currency: 'COP' }}</strong></p>
+        </ion-label>
+
+        <ion-badge color="primary">{{ o.estado }}</ion-badge>
+      </ion-item>
+    </ion-list>
+
+    <ion-infinite-scroll
+      *ngIf="hasMore"
+      threshold="100px"
+      (ionInfinite)="loadMore($event)"
+    >
+      <ion-infinite-scroll-content></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </ng-container>
+
+  <ng-template #loadingTpl>
+    <ion-spinner class="ion-margin"></ion-spinner>
+  </ng-template>
+</ion-content>

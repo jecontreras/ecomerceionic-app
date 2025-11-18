@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Chats</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item 
+      *ngFor="let room of rooms"
+      (click)="openRoom(room.id)"
+      detail
+    >
+      <ion-avatar slot="start">
+        <img src="https://i.pravatar.cc/150?u={{ room.id }}">
+      </ion-avatar>
+
+      <ion-label>
+        <h2>
+          {{ room.lastMessage || 'Sin mensajes' }}
+        </h2>
+        <p>{{ room.lastMessageAt | date:'short' }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

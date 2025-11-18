@@ -1,0 +1,15 @@
+.item-resumen {
+  background: #1c1c1c;
+  padding: 10px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  display: flex;
+
+  .thumb {
+    width: 65px;
+    height: 65px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 10px;
+  }
+}

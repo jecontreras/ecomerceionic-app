@@ -1,0 +1,42 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Carrito</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div *ngIf="items.length === 0" class="empty">
+    <h2>Tu carrito está vacío</h2>
+    <ion-button routerLink="/catalog" color="primary">Ir a comprar</ion-button>
+  </div>
+
+  <div *ngFor="let item of items" class="cart-item">
+    <img [src]="item.image" class="thumb" />
+
+    <div class="info">
+      <div class="title">{{ item.titulo }}</div>
+
+      <div class="variant" *ngIf="item.talla || item.color">
+        <span *ngIf="item.talla">Talla: {{ item.talla }}</span>
+        <span *ngIf="item.color">Color: {{ item.color }}</span>
+      </div>
+
+      <div class="price">${{ item.precio }}</div>
+
+      <input type="number" min="1" [value]="item.cantidad"
+             (change)="updateQty(item, $event)" class="qty" />
+
+      <ion-button fill="clear" color="danger" (click)="remove(item)">Eliminar</ion-button>
+    </div>
+  </div>
+
+  <div class="total-box" *ngIf="items.length > 0">
+    <h2>Total: ${{ total() }}</h2>
+
+    <ion-button expand="block" color="primary" (click)="checkout()">
+      Continuar con el pago
+    </ion-button>
+  </div>
+
+</ion-content>

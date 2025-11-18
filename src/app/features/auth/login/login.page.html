@@ -1,0 +1,26 @@
+<ion-content class="ion-padding login-container">
+
+  <div class="header">
+    <h1>Bienvenido</h1>
+    <p>Inicia sesión para continuar</p>
+  </div>
+
+  <ion-item class="input-dark">
+    <ion-label position="stacked">Teléfono</ion-label>
+    <ion-input type="tel" [(ngModel)]="phone"></ion-input>
+  </ion-item>
+
+  <ion-item class="input-dark">
+    <ion-label position="stacked">Contraseña</ion-label>
+    <ion-input type="password" [(ngModel)]="password"></ion-input>
+  </ion-item>
+
+  <ion-button expand="block" class="btn-login" (click)="submit()">
+    {{ loading ? 'Ingresando...' : 'Entrar' }}
+  </ion-button>
+
+  <div class="footer-text">
+    <a routerLink="/choose-role">Crear cuenta</a>
+  </div>
+
+</ion-content>

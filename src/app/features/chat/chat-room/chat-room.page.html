@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>Chat</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-list>
+    <ion-item *ngFor="let m of messages">
+      <ion-label>
+        <h3>{{ m.sender?.name || 'Usuario' }}</h3>
+        <p>{{ m.message }}</p>
+        <small *ngIf="m.isRead">Visto ✓</small>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+</ion-content>
+
+<ion-footer class="ion-padding">
+  <ion-item>
+    <ion-input
+      placeholder="Escribe un mensaje..."
+      [(ngModel)]="message"
+    ></ion-input>
+
+    <ion-button (click)="send()">Enviar</ion-button>
+  </ion-item>
+</ion-footer>
