@@ -1,0 +1,39 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Mis Órdenes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div *ngIf="loading" class="loading">Cargando...</div>
+
+  <ion-list *ngIf="!loading && orders.length">
+
+    <ion-item *ngFor="let o of orders" (click)="openDetail(o)">
+      <ion-label>
+        <h2>#{{ o.code || o.id }}</h2>
+        <p>
+          Total: ${{ o.total }} <br>
+          Fecha: {{ o.createdAt | date:'short' }} <br>
+          Estado: 
+        </p>
+      </ion-label>
+
+      <ion-badge [color]="
+        o.status === 'nuevo' ? 'warning' :
+        o.status === 'preparacion' ? 'tertiary' :
+        o.status === 'transito' ? 'medium' :
+        o.status === 'entregado' ? 'success' : 'danger'
+      ">
+        {{ o.status }}
+      </ion-badge>
+    </ion-item>
+
+  </ion-list>
+
+  <div *ngIf="!loading && orders.length === 0" class="empty">
+    No tienes órdenes asignadas todavía.
+  </div>
+
+</ion-content>

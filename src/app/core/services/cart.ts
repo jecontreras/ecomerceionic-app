@@ -1,122 +1,121 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
 
 export interface CartItem {
-  id: number;
+  id: number;              // productId
   titulo: string;
   image: string;
   precio: number;
+
   cantidad: number;
-  talla?: string;
-  color?: string;
-  companyId?: string;
-  vendorId?: string;
+
+  companyId: number;       // ✔ Empresa dueña del producto
+  vendorId: number | null; // ✔ Vendedor (si compra desde tienda de un vendedor)
+  vendorProductId?: number | null;
+
+  talla?: string | null;
+  color?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
 export class CartService {
 
-  private key = 'cart_items';
-
-  private cartSubject = new BehaviorSubject<CartItem[]>([]);
-  cart$ = this.cartSubject.asObservable();
+  private key = 'mycart';
+  private cart: CartItem[] = [];
 
   constructor() {
-    const saved = localStorage.getItem(this.key);
-    if (saved) {
-      this.cartSubject.next(JSON.parse(saved));
-    }
+    this.load();
   }
 
   private save() {
-    localStorage.setItem(this.key, JSON.stringify(this.cartSubject.value));
+    localStorage.setItem(this.key, JSON.stringify(this.cart));
+  }
+
+  private load() {
+    const data = localStorage.getItem(this.key);
+    this.cart = data ? JSON.parse(data) : [];
   }
 
   getCart(): CartItem[] {
-    return this.cartSubject.value;
+    return this.cart;
   }
 
-  add(item: CartItem) {
-    const cart = this.getCart();
+  clear() {
+    this.cart = [];
+    this.save();
+  }
 
-    const exists = cart.find(
-      p =>
-        p.id === item.id &&
-        p.talla === item.talla &&
-        p.color === item.color
+  getTotal(): number {
+    return this.cart.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+  }
+
+  /**
+   * Agregar producto al carrito
+   */
+  add(item: CartItem) {
+
+    // Buscar si ya existe el mismo producto con mismas variantes
+    const exists = this.cart.find(ci =>
+      ci.id === item.id &&
+      ci.talla === item.talla &&
+      ci.color === item.color &&
+      ci.vendorId === item.vendorId &&
+      ci.companyId === item.companyId
     );
 
     if (exists) {
       exists.cantidad += item.cantidad;
     } else {
-      cart.push(item);
+      this.cart.push(item);
     }
 
-    this.cartSubject.next([...cart]);
     this.save();
   }
 
-  updateQuantity(item: CartItem, qty: number) {
-    const cart = this.getCart();
-
-    const index = cart.findIndex(
-      p =>
-        p.id === item.id &&
-        p.talla === item.talla &&
-        p.color === item.color
-    );
-
-    if (index >= 0) {
-      cart[index].cantidad = qty;
+  /**
+   * Actualizar cantidad
+   */
+  updateQuantity(productId: number, quantity: number) {
+    const item = this.cart.find(i => i.id === productId);
+    if (item) {
+      item.cantidad = quantity;
+      if (item.cantidad <= 0) this.remove(productId);
+      this.save();
     }
+  }
 
-    this.cartSubject.next([...cart]);
+  /**
+   * Eliminar un producto del carrito
+   */
+  remove(productId: number) {
+    this.cart = this.cart.filter(i => i.id !== productId);
     this.save();
   }
 
-  remove(item: CartItem) {
-    const cart = this.getCart().filter(
-      p =>
-        !(p.id === item.id &&
-          p.talla === item.talla &&
-          p.color === item.color)
-    );
+    /**
+   * Agregar producto usando estructura limpia desde Company o VendorProduct
+   * product  → objeto del producto (Product)
+   * company  → objeto de Company dueño del producto
+   * vendor   → objeto VendorProfile si la compra es desde tienda del vendedor
+   */
+  addFromCompany(product: any, company: any, vendor: any = null, options: any = {}) {
 
-    this.cartSubject.next(cart);
-    this.save();
-  }
-
-  clear() {
-    this.cartSubject.next([]);
-    this.save();
-  }
-
-  getTotal() {
-    return this.getCart().reduce(
-      (sum, item) => sum + item.precio * item.cantidad,
-      0
-    );
-  }
-  addToCart(product:any) {
-  let cart = this.getCart();
-
-  const existing = cart.find(i => i.id === product.id);
-
-  if (existing) {
-    existing.cantidad++;
-  } else {
-    cart.push({
+    const item: CartItem = {
       id: product.id,
       titulo: product.titulo,
-      precio: product.precioVenta,
-      image: product.image,
-      cantidad: 1,
+      image: product.portada || product.image || '',
+      precio: product.precioOferta > 0 ? product.precioOferta : product.precioBase,
 
-      vendorId: product.vendorId,          // 👈 IMPORTANTE
-      companyId: product.companyId || null // 👈 SI APLICA
-    });
+      cantidad: options.cantidad || 1,
+
+      companyId: company.id,
+      vendorId: vendor?.id || null,
+      vendorProductId: product.vendorProductId || null,
+
+      talla: options.talla || null,
+      color: options.color || null,
+    };
+
+    this.add(item);
   }
-
-  localStorage.setItem('cart', JSON.stringify(cart));
-}
+  
 }

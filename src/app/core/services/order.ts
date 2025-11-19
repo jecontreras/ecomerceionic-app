@@ -1,40 +1,67 @@
+// src/app/core/services/order.ts
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiService } from './api';
 
 export interface OrderItem {
-  productId: number;
-  titulo: string;
-  image: string;
-  cantidad: number;
-  precioUnitario: number;
+  id: number;
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+  talla?: string;
+  color?: string;
+  product?: {
+    id: number;
+    titulo?: string;
+    image?: string;
+    precioVenta?: number;
+  };
 }
 
 export interface OrderStatusHistory {
   id: number;
   status: string;
   note?: string;
-  changedAt: string;
+  createdAt: string;
+  changedBy?: number;
   changedByName?: string;
+}
+
+export interface ShippingInfo {
+  nombre: string;
+  telefono: string;
+  direccion: string;
+  ciudad: string;
 }
 
 export interface Order {
   id: number;
-  codigo: string;
-  estado: string;
+  code: string;
+  status: string;
   total: number;
-  fecha: string;
+  createdAt: string;
+
   items: OrderItem[];
   statusHistory?: OrderStatusHistory[];
-  trackingNumber?: string;
-  carrier?: string;
+
+  shippingInfo?: ShippingInfo | null;
+  trackingNumber?: string | null;
+  carrier?: string | null;
+
+  customer?: any;
+  vendor?: any;
+  company?: any;
+  attachments?: any;
 }
 
 @Injectable({ providedIn: 'root' })
 export class OrderService {
+
   constructor(private api: ApiService) {}
 
-  // lista paginada, con filtro opcional
+  // --------------------------
+  // ORDENES DEL CLIENTE
+  // --------------------------
   getMyOrders(page = 1, limit = 10, status?: string): Observable<Order[]> {
     const params: any = { page, limit };
     if (status) params.status = status;
@@ -45,7 +72,16 @@ export class OrderService {
     return this.api.get<Order>(`/orders/${id}`);
   }
 
-  // cambiar estado + tracking opcional
+  // --------------------------
+  // CREAR ORDEN (CLIENTE)
+  // --------------------------
+  createOrder(payload: any): any {
+    return this.api.post('/orders', payload);
+  }
+
+  // --------------------------
+  // CAMBIAR ESTADO (EMPRESA / ADMIN)
+  // --------------------------
   changeStatus(
     id: number,
     status: string,
@@ -58,7 +94,28 @@ export class OrderService {
       carrier,
     });
   }
-  createOrder(payload: any) {
-    return this.api.post('/orders', payload);
+
+  addNote(orderId: number, note: any) {
+    return this.api.post(`/orders/${orderId}/add-note`, { note });
   }
+
+  // --------------------------
+  // ORDENES DEL VENDEDOR
+  // --------------------------
+  getVendorOrders(): Observable<Order[]> {
+    return this.api.get<Order[]>('/orders/vendor');
+  }
+
+  // --------------------------
+  // ORDENES DE LA EMPRESA
+  // --------------------------
+  getCompanyOrders(): Observable<Order[]> {
+    return this.api.get<Order[]>('/orders/company');
+  }
+
+  uploadAttachment(orderId: number, data: FormData) {
+    return this.api.post(`/orders/${orderId}/attachments`, data);
+  }
+
+
 }

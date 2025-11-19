@@ -10,8 +10,9 @@ import { NgFor } from '@angular/common';
 import { Router } from '@angular/router';
 
 import { AuthService } from 'src/app/core/services/auth';
-import { CartService } from 'src/app/core/services/cart';
+import { CartService, CartItem } from 'src/app/core/services/cart';
 import { OrderService } from 'src/app/core/services/order';
+import { forkJoin } from 'rxjs';
 
 @Component({
   standalone: true,
@@ -31,11 +32,10 @@ export class CheckoutPage {
   direccion = '';
   ciudad = '';
 
-  paymentType: 'online' | 'contraentrega' = 'contraentrega';
-
+  paymentType: 'online' | 'cod' = 'cod';
   loading = false;
 
-  items:any = [];
+  items: CartItem[] = [];
 
   constructor(
     private cart: CartService,
@@ -63,36 +63,41 @@ export class CheckoutPage {
 
     this.loading = true;
 
-    const user = this.auth.getCurrentUser();
+    const shipping = {
+      nombre: this.nombre,
+      telefono: this.telefono,
+      direccion: this.direccion,
+      ciudad: this.ciudad
+    };
 
+    // ENVÍO CORRECTO:
+    // → NO agrupamos por empresa aquí
+    // → Cada item ya tiene su companyId y vendorId propio
     const payload = {
-      companyId: 1, // ⚠️ Puedes reemplazar por la empresa del producto
-      vendorId: null, // o vendor si es una tienda
       paymentType: this.paymentType,
-      items: this.items.map((i:any) => ({
+      shipping,
+      items: this.items.map(i => ({
         productId: i.id,
-        cantidad: i.cantidad,
+        companyId: i.companyId,           // ✔ IMPORTANTE
+        vendorId: i.vendorId,             // ✔ IMPORTANTE
+        quantity: i.cantidad,
         talla: i.talla || null,
         color: i.color || null
-      })),
-      shipping: {
-        nombre: this.nombre,
-        telefono: this.telefono,
-        direccion: this.direccion,
-        ciudad: this.ciudad
-      }
+      }))
     };
 
     this.orderService.createOrder(payload).subscribe({
-      next: order => {
+      next: (orders: any[]) => {
         this.loading = false;
         this.cart.clear();
-        alert('Orden creada con éxito');
+
+        alert(`Se generaron ${orders.length} órdenes correctamente`);
         this.router.navigate(['/orders']);
       },
-      error: err => {
+      error: (err:any) => {
         this.loading = false;
-        alert(err.error?.message || 'Error creando orden');
+        console.error(err);
+        alert(err.error?.message || 'Error creando la orden');
       }
     });
   }

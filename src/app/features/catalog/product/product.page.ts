@@ -9,12 +9,16 @@ import {
   IonButton,
   IonLabel,
   IonItem,
+  IonSelect,
+  IonSelectOption,
+  IonInput
 } from '@ionic/angular/standalone';
 
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from 'src/app/core/services/api';
-import { NgIf, NgFor } from '@angular/common';
 import { CartService } from 'src/app/core/services/cart';
+import { NgFor, NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   standalone: true,
@@ -31,14 +35,23 @@ import { CartService } from 'src/app/core/services/cart';
     IonButton,
     IonLabel,
     IonItem,
+    IonSelect,
+    IonSelectOption,
+    IonInput,
     NgIf,
-    NgFor
+    NgFor,
+    FormsModule
   ],
 })
 export class ProductPage implements OnInit {
   product: any = null;
   related: any[] = [];
   loading = true;
+
+  // Selecciones del usuario
+  selectedTalla: string | null = null;
+  selectedColor: string | null = null;
+  cantidad: number = 1;
 
   constructor(
     private route: ActivatedRoute,
@@ -49,11 +62,11 @@ export class ProductPage implements OnInit {
   ngOnInit() {
     const id = this.route.snapshot.params['id'];
 
-    // ADAPTA TU ENDPOINT
     this.api.get<any>(`/products/${id}`).subscribe({
       next: res => {
         this.product = res.product || res;
 
+        // relacionados
         this.related = res.related || [];
 
         this.loading = false;
@@ -64,19 +77,35 @@ export class ProductPage implements OnInit {
       }
     });
   }
+
   addToCart() {
-  const p = this.product;
+    const p = this.product;
 
-  this.cart.add({
-    id: p.id,
-    titulo: p.titulo || p.pro_nombre,
-    image: p.image || p.foto,
-    precio: p.precioVenta || p.pro_uni_venta,
-    cantidad: 1,
-    talla: p.tallaSeleccionada || null,
-    color: p.colorSeleccionado || null,
-  });
+    if (p.tallas?.length && !this.selectedTalla) {
+      alert('Selecciona una talla');
+      return;
+    }
 
-  alert('Producto agregado al carrito');
-}
+    if (p.colores?.length && !this.selectedColor) {
+      alert('Selecciona un color');
+      return;
+    }
+
+    // Empresa y vendedor real
+    const company = p.company || p.companyId || p.idEmpresa;
+    const vendor = p.vendor || p.vendorId || null;
+
+    this.cart.addFromCompany(
+      p,                     // producto completo
+      company,               // empresa dueña
+      vendor,                // vendedor si aplica
+      {
+        talla: this.selectedTalla,
+        color: this.selectedColor,
+        cantidad: this.cantidad
+      }
+    );
+
+    alert('Producto agregado al carrito');
+  }
 }

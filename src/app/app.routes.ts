@@ -34,7 +34,7 @@ export const routes: Routes = [
     path: 'orders',
     canActivate: [authGuard],
     loadChildren: () =>
-      import('./features/orders/orders.routes').then(m => m.ordersRoutes)
+      import('./features/customer/orders/orders.routes').then(m => m.ordersRoutes)
   },
   {
     path: 'notifications',
@@ -60,7 +60,7 @@ export const routes: Routes = [
     loadComponent: () => import('./features/catalog/catalog/catalog.page').then( m => m.CatalogPage)
   },
   {
-    path: 'product',
+    path: 'product/:id',
     loadComponent: () => import('./features/catalog/product/product.page').then( m => m.ProductPage)
   },
   {
@@ -70,6 +70,14 @@ export const routes: Routes = [
   {
     path: 'checkout',
     loadComponent: () => import('./features/checkout/checkout/checkout.page').then( m => m.CheckoutPage)
+  },
+  {
+    path: 'vendor-ordes',
+    loadComponent: () => import('./features/vendor/vendor-orders/vendor-orders.page').then( m => m.VendorOrdersPage)
+  },
+  {
+    path: 'company-orders',
+    loadComponent: () => import('./features/company/company-orders/company-orders.page').then( m => m.CompanyOrdersPage)
   }
 
 ];

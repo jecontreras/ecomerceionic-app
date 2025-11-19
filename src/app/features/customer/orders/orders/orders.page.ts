@@ -82,7 +82,8 @@ export class OrdersPage implements OnInit {
       next: (res) => {
         if (page === 1) this.orders = [];
         this.orders = [...this.orders, ...res];
-        this.hasMore = res.length === 10; // si trae menos, ya no hay más
+
+        this.hasMore = res.length === 10;
         this.loading = false;
         event?.target?.complete();
       },

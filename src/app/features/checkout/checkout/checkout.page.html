@@ -33,7 +33,7 @@
   <ion-item>
     <ion-label>Método</ion-label>
     <ion-select [(ngModel)]="paymentType">
-      <ion-select-option value="contraentrega">Contra entrega</ion-select-option>
+      <ion-select-option value="cod">Contra entrega</ion-select-option>
       <ion-select-option value="online">Pago online</ion-select-option>
     </ion-select>
   </ion-item>
@@ -51,7 +51,12 @@
 
   <h2>Total: ${{ total() }}</h2>
 
-  <ion-button expand="block" color="primary" (click)="submitOrder()" [disabled]="loading">
+  <ion-button
+    expand="block"
+    color="primary"
+    (click)="submitOrder()"
+    [disabled]="loading"
+  >
     {{ loading ? 'Procesando...' : 'Confirmar compra' }}
   </ion-button>
 

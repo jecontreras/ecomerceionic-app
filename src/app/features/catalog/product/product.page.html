@@ -20,7 +20,7 @@
 
   <div class="price-box">
     <div class="price">
-      ${{ product?.precioVenta || product?.pro_uni_venta }}
+      ${{ product?.precioBase }}
     </div>
 
     <div *ngIf="product?.precioOferta" class="offer">
@@ -32,25 +32,50 @@
   <p class="desc">{{ product?.detalle || product?.pro_descripcion }}</p>
 
   <!-- Tallas -->
+<!-- Tallas -->
   <div *ngIf="product?.tallas?.length">
     <h3>Tallas</h3>
-    <div class="chips">
-      <span class="chip" *ngFor="let t of product.tallas">{{ t }}</span>
+
+    <div class="chip-group">
+      <div
+        class="chip"
+        *ngFor="let t of product.tallas"
+        [class.active]="selectedTalla === t"
+        (click)="selectedTalla = t"
+      >
+        {{ t }}
+      </div>
     </div>
   </div>
 
-  <!-- Colores -->
-  <div *ngIf="product?.colores?.length">
-    <h3>Colores</h3>
-    <div class="chips">
-      <span class="chip" *ngFor="let c of product.colores">{{ c }}</span>
+
+<!-- Colores -->
+<div *ngIf="product?.colores?.length">
+  <h3>Colores</h3>
+
+  <div class="chip-group">
+    <div
+      class="chip"
+      *ngFor="let c of product.colores"
+      [class.active]="selectedColor === c"
+      (click)="selectedColor = c"
+    >
+      {{ c }}
     </div>
   </div>
+</div>
 
-  <ion-button expand="block" color="primary" class="btn-buy" (click)="addToCart()">
+
+  <!-- Cantidad -->
+  <ion-item>
+    <ion-label position="stacked">Cantidad</ion-label>
+    <ion-input type="number" min="1" [(ngModel)]="cantidad"></ion-input>
+  </ion-item>
+
+  <!-- Botón de carrito -->
+  <ion-button expand="block" class="btn-buy" (click)="addToCart()">
     Agregar al carrito
   </ion-button>
-
 
   <!-- Productos relacionados -->
   <h2 class="related-title">Relacionados</h2>

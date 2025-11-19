@@ -46,11 +46,11 @@ export class CartPage {
 
   updateQty(item: CartItem, ev: any) {
     const val = Number(ev.target.value);
-    if (val > 0) this.cart.updateQuantity(item, val);
+    if (val > 0) this.cart.updateQuantity(item.id, val);
   }
 
   remove(item: CartItem) {
-    this.cart.remove(item);
+    this.cart.remove(item.id);
     this.items = this.cart.getCart();
   }
 

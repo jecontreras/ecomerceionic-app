@@ -1,0 +1,201 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/orders"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle del Pedido</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ng-container *ngIf="order; else loadingTpl">
+
+    <!-- Resumen -->
+    <h2>Pedido #{{ order.code }}</h2>
+
+    <p>Estado actual:
+      <ion-badge color="primary">{{ order.status }}</ion-badge>
+    </p>
+
+    <p>Total:
+      <strong>{{ order.total | currency:'COP' }}</strong>
+    </p>
+
+    <!-- Envío -->
+    <ion-card class="ion-margin-top">
+      <ion-card-header>
+        <ion-card-title>Datos de envío</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <p><strong>Nombre:</strong> {{ order.shippingInfo?.nombre }}</p>
+        <p><strong>Teléfono:</strong> {{ order.shippingInfo?.telefono }}</p>
+        <p><strong>Dirección:</strong> {{ order.shippingInfo?.direccion }}</p>
+        <p><strong>Ciudad:</strong> {{ order.shippingInfo?.ciudad }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Tracking -->
+    <ion-card class="ion-margin-top">
+      <ion-card-header>
+        <ion-card-title>Tracking / Guía</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+
+        <ion-item>
+          <ion-label position="stacked">Transportadora</ion-label>
+          <ion-input [(ngModel)]="carrier"></ion-input>
+        </ion-item>
+
+        <ion-item class="ion-margin-top">
+          <ion-label position="stacked">Número de guía</ion-label>
+          <ion-input [(ngModel)]="trackingNumber"></ion-input>
+        </ion-item>
+
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Cambiar estado -->
+    <ion-card class="ion-margin-top">
+      <ion-card-header>
+        <ion-card-title>Cambiar estado</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+
+        <ion-item>
+          <ion-label position="stacked">Nuevo estado</ion-label>
+          <ion-select [(ngModel)]="selectedStatus">
+            <ion-select-option *ngFor="let s of statusOptions" [value]="s.value">
+              {{ s.label }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-button expand="block" class="ion-margin-top" (click)="updateStatus()">
+          Guardar cambios
+        </ion-button>
+
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Items -->
+    <ion-list class="ion-margin-top">
+
+      <ion-item *ngFor="let item of order.items">
+        <ion-thumbnail slot="start">
+          <img [src]="item.product?.image || 'assets/img/placeholder.png'" />
+        </ion-thumbnail>
+
+        <ion-label>
+          <h2>{{ item.product?.titulo }}</h2>
+
+          <p>Cantidad: {{ item.quantity }}</p>
+
+          <p>Precio: {{ item.unitPrice | currency:'COP' }}</p>
+        </ion-label>
+      </ion-item>
+
+    </ion-list>
+
+    <!-- Historial (Timeline Mejorado) -->
+    <ion-card class="ion-margin-top" *ngIf="order.statusHistory?.length">
+      <ion-card-header>
+        <ion-card-title>Historial de Estados</ion-card-title>
+
+        <ion-button fill="outline" size="small" color="primary" (click)="openNoteModal()">
+          Agregar Nota
+        </ion-button>
+      </ion-card-header>
+
+      <ion-card-content>
+
+        <div class="timeline">
+
+          <div
+            class="timeline-item animate"
+            *ngFor="let h of order.statusHistory; let last = last">
+
+            <!-- Marker con icono -->
+            <div class="timeline-marker" [ngClass]="h.status">
+              <ion-icon [name]="getStatusIcon(h.status)"></ion-icon>
+            </div>
+
+            <!-- Contenido -->
+            <div class="timeline-content">
+
+              <h3>{{ h.status | titlecase }}</h3>
+
+              <p class="date">{{ h.createdAt | date:'short' }}</p>
+
+              <p *ngIf="h.note">
+                <strong>Nota:</strong> {{ h.note }}
+              </p>
+
+            </div>
+
+            <!-- Línea vertical -->
+            <div class="timeline-line" *ngIf="!last"></div>
+
+          </div>
+
+        </div>
+
+      </ion-card-content>
+    </ion-card>
+
+
+    <!-- Chat -->
+    <ion-button expand="block" color="secondary" class="ion-margin-top"
+                (click)="openChat()">
+      Chat sobre este pedido
+    </ion-button>
+
+    <ion-button expand="block" color="medium" (click)="fileInput.click()">
+      Subir evidencia
+    </ion-button>
+
+    <input #fileInput type="file" hidden (change)="uploadAttachment($event)" />
+
+  </ng-container>
+
+  <ng-template #loadingTpl>
+    <ion-spinner></ion-spinner>
+  </ng-template>
+
+</ion-content>
+
+<!-- Modal Nota -->
+<ion-modal #noteModal>
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Agregar Nota</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeNoteModal()">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+
+      <ion-item>
+        <ion-label position="stacked">Escribe tu nota</ion-label>
+        <ion-textarea rows="5" [(ngModel)]="noteText"></ion-textarea>
+      </ion-item>
+
+      <!-- ⭐ NUEVO: toggle de visibilidad ⭐ -->
+      <ion-item class="ion-margin-top">
+        <ion-label>Visible para cliente</ion-label>
+        <ion-toggle [(ngModel)]="noteVisible"></ion-toggle>
+      </ion-item>
+
+      <ion-button expand="block" class="ion-margin-top" (click)="saveNote()">
+        Guardar Nota
+      </ion-button>
+
+    </ion-content>
+  </ng-template>
+</ion-modal>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
@@ -21,11 +21,13 @@ import {
   IonCardContent,
 } from '@ionic/angular/standalone';
 
-import { NgIf, NgFor, CurrencyPipe, DatePipe, CommonModule, AsyncPipe } from '@angular/common';
+import { NgIf, NgFor, CurrencyPipe, DatePipe, CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Order, OrderService } from 'src/app/core/services/order';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { addIcons } from 'ionicons';
+import { cube, checkmarkCircle, bus, refreshCircle, alertCircle } from 'ionicons/icons';
 
 @Component({
   standalone: true,
@@ -56,12 +58,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     IonicModule,
     FormsModule,
     ReactiveFormsModule,
-    AsyncPipe,
     DatePipe,
     NgIf,
     NgFor,
     CurrencyPipe,
-    DatePipe,
   ],
 })
 export class OrderDetailPage implements OnInit {
@@ -79,17 +79,39 @@ export class OrderDetailPage implements OnInit {
   selectedStatus = '';
   trackingNumber = '';
   carrier = '';
+  noteText = '';
+  @ViewChild('noteModal') noteModal: any;
+  noteVisible = true;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private orderService: OrderService
-  ) {}
+  ) {
+      addIcons({
+        cube,
+        checkmarkCircle,
+        bus,
+        refreshCircle,
+        alertCircle
+      });
+  }
 
   ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.load(id);
   }
+
+  getStatusIcon(status: string) {
+  switch (status) {
+    case 'nuevo': return 'cube';
+    case 'preparacion': return 'refresh-circle';
+    case 'transito': return 'bus';
+    case 'entregado': return 'checkmark-circle';
+    case 'devuelto': return 'alert-circle';
+    default: return 'cube';
+  }
+}
 
   load(id: number) {
     this.loading = true;
@@ -97,9 +119,15 @@ export class OrderDetailPage implements OnInit {
     this.orderService.getOrderDetail(id).subscribe({
       next: (res) => {
         this.order = res;
+        if( this.order.statusHistory ){
+          this.order.statusHistory = this.order.statusHistory.sort(
+            (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+        }
         this.loading = false;
 
-        this.selectedStatus = res.estado;
+        // asignar valores reales
+        this.selectedStatus = res.status;
         this.trackingNumber = res.trackingNumber || '';
         this.carrier = res.carrier || '';
       },
@@ -107,6 +135,7 @@ export class OrderDetailPage implements OnInit {
         this.loading = false;
       },
     });
+    
   }
 
   updateStatus() {
@@ -121,10 +150,9 @@ export class OrderDetailPage implements OnInit {
       )
       .subscribe({
         next: (updated: any) => {
-          // si el backend devuelve la orden actualizada
           this.order = {
             ...this.order!,
-            estado: this.selectedStatus,
+            status: this.selectedStatus,
             trackingNumber: this.trackingNumber,
             carrier: this.carrier,
             statusHistory: updated.statusHistory || this.order?.statusHistory,
@@ -140,9 +168,62 @@ export class OrderDetailPage implements OnInit {
 
   openChat() {
     if (!this.order) return;
-    // puedes pasar el orderId como queryParam para que el chat sepa
+
     this.router.navigate(['/chat'], {
       queryParams: { orderId: this.order.id },
     });
   }
+
+  openNoteModal() {
+    this.noteText = '';
+    this.noteModal.present();
+  }
+
+  closeNoteModal() {
+    this.noteModal.dismiss();
+  }
+  saveNote() {
+    if (!this.order || !this.noteText.trim()) return;
+
+    this.orderService.addNote(this.order.id, {
+      note: this.noteText,
+      visibleToCustomer: this.noteVisible
+    }).subscribe({
+      next: (res:any) => {
+        if( res.id ){
+          this.order = res;
+          this.noteText = '';
+          this.noteVisible = true;
+          this.closeNoteModal();
+          alert('Nota agregada');
+        }
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Error guardando nota');
+      }
+    });
+  }
+
+  uploadAttachment(event: any) {
+    const file = event.target.files[0];
+    if (!file || !this.order) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('visibleToCustomer', 'true'); // o false
+
+    this.orderService.uploadAttachment(this.order.id, formData).subscribe({
+      next: (res) => {
+        if( this.order){
+          this.order.attachments = [...(this.order.attachments || []), res];
+        }
+        alert('Archivo subido');
+      },
+      error: () => alert('Error subiendo archivo'),
+    });
+  }
+
+
+
 }

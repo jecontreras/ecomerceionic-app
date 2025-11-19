@@ -28,12 +28,12 @@
         (click)="goToDetail(o.id)"
       >
         <ion-label>
-          <h2>Pedido #{{ o.codigo }}</h2>
-          <p>{{ o.fecha | date: 'medium' }}</p>
+          <h2>Pedido #{{ o.code }}</h2>
+          <p>{{ o.createdAt | date: 'medium' }}</p>
           <p>Total: <strong>{{ o.total | currency: 'COP' }}</strong></p>
         </ion-label>
 
-        <ion-badge color="primary">{{ o.estado }}</ion-badge>
+        <ion-badge color="primary">{{ o.status }}</ion-badge>
       </ion-item>
     </ion-list>
 
