@@ -1,0 +1,29 @@
+<ion-header>
+  <ion-toolbar class="header-toolbar">
+
+    <!-- Searchbar -->
+    <ion-searchbar placeholder="Buscar productos"
+                   (ionChange)="onSearch($event)">
+    </ion-searchbar>
+
+    <!-- Buttons right -->
+    <ion-buttons slot="end">
+      <ion-button (click)="goToHelp()">
+        <ion-icon name="help-circle-outline"></ion-icon>
+      </ion-button>
+
+      <ion-button (click)="goToNotifications()">
+        <ion-icon name="notifications-outline"></ion-icon>
+      </ion-button>
+
+      <ion-button (click)="goToLogin()">
+        <ion-icon name="person-circle-outline"></ion-icon>
+      </ion-button>
+
+      <ion-button (click)="goToCart()">
+        <ion-icon name="cart-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>

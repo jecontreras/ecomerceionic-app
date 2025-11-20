@@ -8,6 +8,16 @@ import { IonicModule } from '@ionic/angular';
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
 import { tokenInterceptor } from './app/core/interceptors/token-interceptor';
+import { addIcons } from 'ionicons';
+import { cartOutline, giftOutline, helpCircleOutline, personCircleOutline, refreshCircleOutline } from 'ionicons/icons';
+
+addIcons({
+  'help-circle-outline': helpCircleOutline,
+  'person-circle-outline': personCircleOutline,
+  'cart-outline': cartOutline,
+   'gift-outline': giftOutline,
+  'refresh-circle-outline': refreshCircleOutline,
+});
 
 bootstrapApplication(AppComponent, {
   providers: [

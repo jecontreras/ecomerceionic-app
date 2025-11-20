@@ -1,16 +1,95 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>Marketplace</ion-title>
+
+  <!-- Toolbar superior: logo + acciones -->
+  <ion-toolbar class="toolbar-main">
+    <ion-title size="small" class="app-title">
+      MultiStore
+    </ion-title>
+
+    <ion-buttons slot="end" class="top-actions">
+      <!-- Ayuda / servicio -->
+      <ion-chip outline (click)="goToHelp()">
+        <ion-icon name="help-circle-outline"></ion-icon>
+        <ion-label>Ayuda</ion-label>
+      </ion-chip>
+
+
+      <!-- Cuenta -->
+      <ion-button fill="clear" (click)="goToAccount()">
+        <ion-icon name="person-circle-outline"></ion-icon>
+      </ion-button>
+
+      <!-- Carrito SIEMPRE visible -->
+      <ion-button fill="clear" (click)="goToCart()">
+        <ion-icon name="cart-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
+
+  <!-- Toolbar de búsqueda -->
+  <ion-toolbar class="toolbar-search">
+    <ion-searchbar
+      placeholder="Buscar productos"
+      (ionChange)="onSearchChange($event)">
+    </ion-searchbar>
+  </ion-toolbar>
+
+  <!-- Barra cuenta/registro al estilo "Sign in to see deals" -->
+  <ion-toolbar class="toolbar-account">
+    <ng-container *ngIf="(currentUser$ | async) as user; else guestBlock">
+      <div class="account-info">
+        <ion-avatar>
+          <img src="assets/img/avatar-placeholder.png" />
+        </ion-avatar>
+        <div class="account-text">
+          <div class="hello">Hola,</div>
+          <div class="name">{{ user.fullName }}</div>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #guestBlock>
+      <div class="welcome-row">
+        <div class="welcome-text">
+          <div class="title">Inicia sesión para ver ofertas personalizadas</div>
+        </div>
+        <div class="welcome-actions">
+          <ion-button size="small" color="primary" (click)="goToLogin()">
+            Entrar
+          </ion-button>
+          <ion-button
+            size="small"
+            fill="outline"
+            color="primary"
+            (click)="goToRegister()">
+            Crear cuenta
+          </ion-button>
+        </div>
+      </div>
+    </ng-template>
+  </ion-toolbar>
+
 </ion-header>
 
-<ion-content class="ion-padding home-container">
+<ion-content class="home-container ion-padding">
 
-  <!-- Buscador -->
-  <ion-searchbar
-    placeholder="Buscar productos"
-    (ionChange)="onSearchChange($event)">
-  </ion-searchbar>
+  <!-- “Servicios” rápidos tipo AliExpress -->
+  <div class="service-row">
+    <ion-chip outline>
+      <ion-icon name="gift-outline"></ion-icon>
+      <ion-label>Bienvenida hasta -70%</ion-label>
+    </ion-chip>
+
+    <ion-chip outline>
+      <ion-icon name="refresh-circle-outline"></ion-icon>
+      <ion-label>Devoluciones gratis</ion-label>
+    </ion-chip>
+
+    <ion-chip outline (click)="goToHelp()">
+      <ion-icon name="help-circle-outline"></ion-icon>
+      <ion-label>Ayuda</ion-label>
+    </ion-chip>
+  </div>
 
   <!-- Categorías -->
   <div class="section-header">
@@ -47,7 +126,9 @@
         <img [src]="p.image || p.foto || 'assets/img/placeholder.png'" />
       </div>
       <div class="info">
-        <div class="title">{{ p.titulo || p.pro_nombre }}</div>
+        <div class="title">
+          {{ p.titulo || p.pro_nombre }}
+        </div>
         <div class="price">
           {{ (p.precioVenta || p.pro_uni_venta) | currency:'COP':'symbol-narrow' }}
         </div>
@@ -69,7 +150,9 @@
         <img [src]="p.image || p.foto || 'assets/img/placeholder.png'" />
       </div>
       <div class="info">
-        <div class="title">{{ p.titulo || p.pro_nombre }}</div>
+        <div class="title">
+          {{ p.titulo || p.pro_nombre }}
+        </div>
       </div>
     </div>
   </div>
@@ -88,7 +171,9 @@
         <img [src]="p.image || p.foto || 'assets/img/placeholder.png'" />
       </div>
       <div class="info">
-        <div class="title">{{ p.titulo || p.pro_nombre }}</div>
+        <div class="title">
+          {{ p.titulo || p.pro_nombre }}
+        </div>
         <div class="price">
           {{ (p.precioVenta || p.pro_uni_venta) | currency:'COP':'symbol-narrow' }}
         </div>
